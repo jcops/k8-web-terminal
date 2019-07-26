@@ -1,0 +1,22 @@
+{
+  "name": "xterm",
+  "version": "0.33.0",
+  "ignore": ["demo", "test", ".gitignore"],
+  "main": "src/xterm.js",
+  "repository": "https://github.com/sourcelair/xterm.js",
+  "license": "MIT",
+  "devDependencies": {
+    "express": "4.13.4",
+    "express-ws": "2.0.0-rc.1",
+    "pty.js": "0.3.0",
+    "mocha": "2.5.3",
+    "chai": "3.5.0",
+    "jsdoc": "3.4.0",
+    "docdash": "0.4.0"
+  },
+  "scripts": {
+    "start": "node demo/app",
+    "test": "mocha --recursive",
+    "build:docs": "node_modules/.bin/jsdoc -c jsdoc.json"
+  }
+}

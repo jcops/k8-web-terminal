@@ -4,9 +4,12 @@
 *.dll
 *.so
 *.dylib
-
+kkk
+config
+k8
 # Test binary, build with `go test -c`
 *.test
-
+*.git
+*.idea
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out

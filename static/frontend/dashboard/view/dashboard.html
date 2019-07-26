@@ -1,0 +1,54 @@
+<div flex layout="column" ng-controller="DashboardController as dl">
+
+    <md-toolbar layout="row" class="md-whiteframe-z2">
+        <md-button class="menu" hide-gt-sm ng-click="dl.toggleList()" aria-label="Show Node List">
+            <md-icon md-svg-icon="menu"></md-icon>
+        </md-button>
+        <h1>K8 web terminal</h1>
+    </md-toolbar>
+
+    <div flex layout="row">
+
+        <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="md-whiteframe-z2" md-component-id="left"
+        layout="column">
+            <md-list flex>
+                <md-list-item class="md-3-line" ng-repeat="it in dl.nodes">
+                    <md-button layout="row" ng-click="dl.selectNode(it)" ng-class="{'selected' : it === dl.selected }">
+                        <md-icon md-svg-icon="docker" class="avatar"></md-icon>
+                        <div class="md-list-item-text" layout="column" flex-offset="15">
+                            <h3>{{it.metadata.name}}</h3>
+                            <h4>{{it.status.addresses[0].address}}</h4>
+                            <p>{{it.status.nodeInfo.osImage}}</p>
+                        </div>
+                    </md-button>
+                </md-list-item>
+            </md-list>
+        </md-sidenav>
+
+        <md-content flex class="md-padding" layout-xs="column" layout-align="center" layout="row">
+            <md-list flex>
+                <md-list-item ng-repeat="it in dl.containers">
+                    <div flex-xs flex-gt-xs="100" layout="column">
+                        <md-card md-theme="default" md-theme-watch>
+                            <md-card-title>
+                                <md-card-title-text>
+                                    <span class="md-headline">{{it.Id | limitTo: 11}}</span>
+                                    <span class="md-subhead">name: {{it.Name}}</span>
+                                    <span class="md-subhead">image: {{it.Image}}</span>
+                                    <span class="md-subhead">command: {{it.Command}}</span>
+                                    <span class="md-subhead">created: {{it.Created*1000 | date:'medium'}}</span>
+                                    <span class="md-subhead">status: {{it.Status}}</span>
+                                </md-card-title-text>
+                            </md-card-title>
+                            <md-card-actions layout="row" layout-align="end center">
+                                <md-button class="md-fab md-primary" aria-label="terminal" target='_blank' ng-href='/container/terminal?name={{it.Name}}&namespace={{it.Namespace}}'>
+                                    <md-icon md-svg-icon="terminal"></md-icon>
+                                </md-button>
+                            </md-card-actions>
+                        </md-card>
+                    </div>
+                </md-list-item>
+            </md-list>
+        </md-content>
+    </div>
+</div>
