@@ -4,7 +4,6 @@ import (
 	"github.com/astaxie/beego"
 	"log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"fmt"
 	"strings"
 	"k8s.io/api/core/v1"
 	"time"
@@ -51,7 +50,6 @@ func (c *MainController) Nodes()  {
 // @router /api/nodes/containers [get]
 func (c *MainController) NodePods()  {
 	nodeip := c.GetString("node")
-	fmt.Println("sssss",nodeip)
 	//resp, err := Clientset.CoreV1().Nodes().List(metav1.ListOptions{})
 	nodespod111, err := Clientset.CoreV1().Pods(v1.NamespaceAll).List(metav1.ListOptions{
 		FieldSelector: "spec.nodeName=" + nodeip,
@@ -108,7 +106,6 @@ func (c *MainController) NodePods()  {
 		}
 		mapss = append(mapss, maps)
 	}
-	fmt.Println(mapss)
 	c.Data["json"] =  mapss
 	c.ServeJSON()
 }

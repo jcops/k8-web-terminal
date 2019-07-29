@@ -24,6 +24,30 @@
 
 ![1](./doc/1.png)
 
+## 使用方式
+- 1
+  在k8s集群内部署：使用"k8-deploy.yaml"编排进行部署
+  ```cgo
+  [root@hub-01 ~]# kubectl apply -f k8-deploy.yaml 
+  deployment "terminal-xcbgj" created
+  service "terminal" created
+  [root@hub-01 ~]# kubectl get po
+  NAME                              READY     STATUS    RESTARTS   AGE
+  terminal-xcbgj-78c7ff9ffc-kp99q   1/1       Running   0          26s
+
+- 2 
+  在集群外部署： 需要有/root/.kube/config文件
+  ```cgo
+  [root@k8s-01 k8]# ls /root/.kube/config 
+  /root/.kube/config
+  [root@k8s-01 k8]# ls
+  conf  k8-web-terminal  static  views
+  [root@k8s-01 k8]# ./k8-web-terminal 
+  2019/07/29 10:25:06.793 [I] [asm_amd64.s:1333]  http server Running on http://:8089
+  # 也可以手动指定文件路径
+  ./k8-web-terminal  --kubeconfig ./config
+
+
 ## 感谢以下框架的开源支持
 
 - [Beego] - <http://beego.me/>
