@@ -4,9 +4,9 @@ import (
 	"os"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"flag"
 	"path/filepath"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 var Clientset *kubernetes.Clientset
@@ -32,7 +32,7 @@ func init() {
 	//在 kubeconfig 中使用当前上下文环境，config 获取支持 url 和 path 方式
 	Config, err =rest.InClusterConfig()
 	if err != nil {
-		Config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+		Config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -46,7 +46,6 @@ func init() {
 			panic(err.Error())
 		}
 	}
-
 
 
    ////  集群内方式

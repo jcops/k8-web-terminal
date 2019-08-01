@@ -1,0 +1,5 @@
+**********************************************************
+* * * * * * * * * Welcome to K8 * * * * * * * * *
+**********************************************************
+Note: if TERM is not set, you should 'export TERM=vt100'
+first before using interactive command.
