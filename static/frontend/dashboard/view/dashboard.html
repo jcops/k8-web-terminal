@@ -34,14 +34,16 @@
                                 <md-card-title-text>
                                     <span class="md-headline">{{it.Id | limitTo: 11}}</span>
                                     <span class="md-subhead">name: {{it.Name}}</span>
+                                    <span class="md-subhead">appname: {{it.AppName}}</span>
                                     <span class="md-subhead">image: {{it.Image}}</span>
                                     <span class="md-subhead">command: {{it.Command}}</span>
                                     <span class="md-subhead">created: {{it.Created*1000 | date:'medium'}}</span>
                                     <span class="md-subhead">status: {{it.Status}}</span>
+
                                 </md-card-title-text>
                             </md-card-title>
                             <md-card-actions layout="row" layout-align="end center">
-                                <md-button class="md-fab md-primary" aria-label="terminal" target='_blank' ng-href='/container/terminal?name={{it.Name}}&namespace={{it.Namespace}}'>
+                                <md-button class="md-fab md-primary" aria-label="terminal" target='_blank' ng-href='/container/terminal?name={{it.Name}}&namespace={{it.Namespace}}&container={{it.AppName}}'>
                                     <md-icon md-svg-icon="terminal"></md-icon>
                                 </md-button>
                             </md-card-actions>

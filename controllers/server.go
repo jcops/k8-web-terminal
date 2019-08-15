@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"github.com/astaxie/beego"
 	"io/ioutil"
+	"errors"
 )
 type TSockjs struct {
 	beego.Controller
@@ -25,6 +26,7 @@ var (
 	sshReq *rest.Request
 	podName string
 	podNs string
+	container string
 	executor remotecommand.Executor
 	handler *streamHandler
 	err error
@@ -131,7 +133,7 @@ func (wsConn *WsConnection) WsWrite(messageType int, data []byte) (err error) {
 	case wsConn.outChan <- &WsMessage{messageType, data,}:
 
 	case <- wsConn.closeChan:
-		//err = errors.New("websocket closed")
+		err = errors.New("WsWrite websocket closed")
 		break
 	}
 	return
@@ -143,7 +145,7 @@ func (wsConn *WsConnection) WsRead() (msg *WsMessage, err error) {
 	case msg = <- wsConn.inChan:
 		return
 	case <- wsConn.closeChan:
-		//err = errors.New("websocket closed")
+		err = errors.New("WsRead websocket closed")
 		break
 	}
 	return
@@ -210,9 +212,6 @@ func (handler *streamHandler) Read(p []byte) (size int, err error) {
 
 // executor回调向web端输出
 func (handler *streamHandler) Write(p []byte) (size int, err error) {
-
-
-
 	// 产生副本
 	copyData = make([]byte, len(p))
 	copy(copyData, p)
@@ -234,24 +233,29 @@ func isValidBash(isValidbash []string, shell string) bool {
 func (t *TSockjs) ServeHTTP()  {
 	podNs = t.GetString("namespace")
 	podName = t.GetString("name")
+	container = t.GetString("container")
+	if podName =="" || container == "" {
+		fmt.Println( "Pod and container are required!")
+		return
+	}
 	if wsConn, err = InitWebsocket(t.Ctx.ResponseWriter, t.Ctx.Request); err != nil {
-	fmt.Println("wsConn err",err)
+	    fmt.Println("wsConn err",err)
 		wsConn.WsClose()
 	}
 
 	datas ,_:= ioutil.ReadFile("conf/titletext")
 	wsConn.WsWrite(websocket.TextMessage,datas )
 
-	fmt.Println(fmt.Sprintf("Namespace:%s podName:%s",podNs,podName))
+	fmt.Println(fmt.Sprintf("Namespace:%s podName:%s container:%s",podNs,podName,container))
 	validbashs := []string{"/bin/bash","/bin/sh" }
 	var err error
 	if isValidBash(validbashs, "") {
 		cmds := []string{""}
-		err = startProcess(podName,podNs, cmds)
+		err = startProcess(podName,podNs, container,cmds)
 		} else {
 			for _, testShell := range validbashs {
 				cmd := []string{testShell}
-				if err = startProcess(podName,podNs, cmd);err != nil {
+				if err = startProcess(podName,podNs, container, cmd);err != nil {
 						continue
 					}
 				}
@@ -261,7 +265,7 @@ func (t *TSockjs) ServeHTTP()  {
 
 
 
-func  startProcess(podName string,podNs string, cmd []string ) error {
+func  startProcess(podName string,podNs string,container string, cmd []string ) error {
 	// URL:
 	// https://172.16.0.143:6443/api/v1/namespaces/default/pods/nginx-deployment-5cbd8757f-d5qvx/exec?command=sh&container=nginx&stderr=true&stdin=true&stdout=true&tty=true
 	sshReq = Clientset.CoreV1().RESTClient().Post().
@@ -270,6 +274,7 @@ func  startProcess(podName string,podNs string, cmd []string ) error {
 		Namespace(podNs).
 		SubResource("exec").
 		VersionedParams(&v1.PodExecOptions{
+			Container: container,
 			Command:   cmd,
 			Stdin:     true,
 			Stdout:    true,
@@ -279,8 +284,10 @@ func  startProcess(podName string,podNs string, cmd []string ) error {
 
 	// 创建到容器的连接
 	if executor, err = remotecommand.NewSPDYExecutor(Config, "POST", sshReq.URL()); err != nil {
+		wsConn.WsClose()
 		return err
-		//wsConn.WsClose()
+
+
 	}
 
 	// 配置与容器之间的数据流处理回调
@@ -292,8 +299,9 @@ func  startProcess(podName string,podNs string, cmd []string ) error {
 		TerminalSizeQueue: handler,
 		Tty:               true,
 	}); err != nil {
+		fmt.Println("handler",err)
 		return err
-		//wsConn.WsClose()
+
 	}
 	return err
 
