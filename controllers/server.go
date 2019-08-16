@@ -234,10 +234,7 @@ func (t *TSockjs) ServeHTTP()  {
 	podNs = t.GetString("namespace")
 	podName = t.GetString("name")
 	container = t.GetString("container")
-	if podName =="" || container == "" {
-		fmt.Println( "Pod and container are required!")
-		return
-	}
+
 	if wsConn, err = InitWebsocket(t.Ctx.ResponseWriter, t.Ctx.Request); err != nil {
 	    fmt.Println("wsConn err",err)
 		wsConn.WsClose()
